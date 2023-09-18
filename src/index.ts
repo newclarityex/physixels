@@ -1,9 +1,10 @@
 import { create } from 'random-seed';
 
-type Options = {
+export type Options = {
     bias: 'left' | 'right' | 'random';
     seed: string | null;
     skip: number;
+    diagonalPassthrough: boolean;
     cellTypes: {
         id: number;
         behavior: 'empty' | 'static' | 'dynamic';
@@ -14,6 +15,7 @@ const defaultOptions: Options = {
     bias: 'random',
     seed: null,
     skip: 0,
+    diagonalPassthrough: true,
     cellTypes: [
         { id: 0, behavior: 'empty' },
         { id: 1, behavior: 'static' },
@@ -45,8 +47,10 @@ export function step(data: number[][], options?: Partial<Options>) {
 
     // Loop through for each skip
     for (let i = 0; i < finalOptions.skip + 1; i++) {
-        // Loop through each cell
-        for (const [y, row] of newData.entries()) {
+        // Loop through each row backwards
+        for (let y = newData.length - 1; y >= 0; y--) {
+            const row = newData[y];
+            if (!row) continue;
             for (const [x, cell] of row.entries()) {
                 const behavior = behaviors.get(cell);
                 if (!behavior || behaviors.get(cell) === 'empty' || behaviors.get(cell) === 'static') {
@@ -55,7 +59,7 @@ export function step(data: number[][], options?: Partial<Options>) {
 
                 // If empty underneath, fall
                 const belowRow = newData[y + 1];
-                if (!belowRow) return;
+                if (!belowRow) continue;
 
                 const belowCell = belowRow && belowRow[x];
                 const belowCellBehavior = belowCell === undefined ? undefined : behaviors.get(belowCell);
@@ -76,18 +80,22 @@ export function step(data: number[][], options?: Partial<Options>) {
                 const offset = bias === 0 ? -1 : 1;
 
                 {
+                    const adjacentCell = row[x + offset];
+                    const adjacentCellBehavior = adjacentCell === undefined ? undefined : behaviors.get(adjacentCell);
                     const targetCell = belowRow[x + offset];
                     const targetCellBehavior = targetCell === undefined ? undefined : behaviors.get(targetCell);
-                    if (targetCellBehavior === 'empty') {
+                    if (targetCellBehavior === 'empty' && (finalOptions.diagonalPassthrough || adjacentCellBehavior === 'empty')) {
                         row[x] = 0;
                         belowRow[x + offset] = cell;
                         continue;
                     }
                 }
                 {
+                    const adjacentCell = row[x - offset];
+                    const adjacentCellBehavior = adjacentCell === undefined ? undefined : behaviors.get(adjacentCell);
                     const targetCell = belowRow[x - offset];
                     const targetCellBehavior = targetCell === undefined ? undefined : behaviors.get(targetCell);
-                    if (targetCellBehavior === 'empty') {
+                    if (targetCellBehavior === 'empty' && (finalOptions.diagonalPassthrough || adjacentCellBehavior === 'empty')) {
                         row[x] = 0;
                         belowRow[x - offset] = cell;
                         continue;
