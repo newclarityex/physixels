@@ -1,0 +1,26 @@
+{
+  "name": "physixels",
+  "description": "Pixel-based physics engine",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "lint": "tsc"
+  },
+  "devDependencies": {
+    "@types/random-seed": "^0.3.3",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "random-seed": "^0.3.0"
+  },
+  "repository": {
+    "url": "https://example.com/your-username/my-new-project",
+    "type": "git"
+  },
+  "author": "Your Name <you@example.com>",
+  "license": "MIT"
+}
