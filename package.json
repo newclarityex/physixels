@@ -1,7 +1,7 @@
 {
   "name": "physixels",
   "description": "Pixel-based physics engine",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/index",
   "module": "dist/index.mjs",
   "types": "dist/index",
